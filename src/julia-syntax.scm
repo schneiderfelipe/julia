@@ -2423,12 +2423,10 @@
                 ;; convert nested hcat inside vcat to hvcat
                 (let ((rows (map (lambda (x)
                                    (if (and (pair? x) (eq? (car x) 'row))
-                                       (cdr x)
-                                       (list x)))
+                                       `(tuple ,.(cdr x))
+                                       (list 'tuple x)))
                                  a)))
-                  `(call (top hvcat)
-                         (tuple ,.(map length rows))
-                         ,.(apply append rows)))
+                  `(call (top hvcat_rows) ,.rows))
                 `(call (top vcat) ,@a))))))
 
    'typed_hcat
@@ -2450,12 +2448,10 @@
             ;; convert nested hcat inside vcat to hvcat
             (let ((rows (map (lambda (x)
                                (if (and (pair? x) (eq? (car x) 'row))
-                                   (cdr x)
-                                   (list x)))
+                                   `(tuple ,.(cdr x))
+                                   (list 'tuple x)))
                              a)))
-              `(call (top typed_hvcat) ,t
-                     (tuple ,.(map length rows))
-                     ,.(apply append rows)))
+              `(call (top typed_hvcat_rows) ,t ,.rows))
             `(call (top typed_vcat) ,t ,@a)))))
 
    '|'|  (lambda (e) (expand-forms `(call |'| ,(cadr e))))

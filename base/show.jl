@@ -748,22 +748,19 @@ function show_unionaliases(io::IO, x::Union)
 end
 
 function show(io::IO, ::MIME"text/plain", @nospecialize(x::Type))
-    show(io, x)
-    if !print_without_params(x) && get(io, :compact, true)
+    if !print_without_params(x)
         properx = makeproper(io, x)
         if make_typealias(properx) !== nothing || x <: make_typealiases(properx)[2]
-            print(io, " (alias for ")
-            show(IOContext(io, :compact => false), x)
-            print(io, ")")
+            show(IOContext(io, :compact => true), x)
+            if !(get(io, :compact, false)::Bool)
+                print(io, " (alias for ")
+                show(IOContext(io, :compact => false), x)
+                print(io, ")")
+            end
+            return
         end
     end
-
-    #s1 = sprint(show, x, context = io)
-    #s2 = sprint(show, x, context = IOContext(io, :compact => false))
-    #print(io, s1)
-    #if s1 != s2
-    #    print(io, " = ", s2)
-    #end
+    show(io, x)
 end
 
 function show(io::IO, @nospecialize(x::Type))
